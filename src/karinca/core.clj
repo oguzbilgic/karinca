@@ -1,7 +1,8 @@
 (ns karinca.core
   (:use karinca.constants
-        karinca.common
-        karinca.ui))
+        [karinca.common :only [place]])
+  (:require
+        [karinca.ui :as ui]))
 
 (defn create-ant
   "create an ant at the location, returning an ant agent on the location"
@@ -188,6 +189,6 @@
   "I don't do a whole lot ... yet."
   [& args]
   (def ants (setup))
-  (send-off animator animation)
+  (send-off ui/animator ui/animation)
   (dorun (map #(send-off % behave) ants))
   (send-off evaporator evaporation))

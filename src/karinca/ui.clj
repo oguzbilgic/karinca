@@ -1,11 +1,10 @@
 (ns karinca.ui
   (:use karinca.constants
-        karinca.common))
-
-(import
- '(java.awt Color Graphics Dimension)
- '(java.awt.image BufferedImage)
- '(javax.swing JPanel JFrame))
+        [karinca.common :only [place]])
+  (:import
+        (java.awt Color Graphics Dimension)
+        (java.awt.image BufferedImage)
+        (javax.swing JPanel JFrame)))
 
 ;pixels per world cell
 (def scale 5)

@@ -1,5 +1,5 @@
 (ns karinca.common
-  (:use karinca.constants))
+  (:use [karinca.constants :only [cell dim]]))
 
 ;world is a 2d vector of refs to cells
 (def world

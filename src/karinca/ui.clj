@@ -1,6 +1,6 @@
 (ns karinca.ui
   (:use karinca.constants
-        [karinca.common :only [place]])
+        [karinca.world :only [place]])
   (:import
         (java.awt Color Graphics Dimension)
         (java.awt.image BufferedImage)

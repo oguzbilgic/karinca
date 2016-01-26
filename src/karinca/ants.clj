@@ -1,6 +1,6 @@
 (ns karinca.ants
   (:use karinca.constants
-        [karinca.common :only [place]])
+        [karinca.world :only [place]])
   (:require
         [karinca.ui :as ui]))
 

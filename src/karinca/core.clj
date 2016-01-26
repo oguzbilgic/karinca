@@ -15,11 +15,11 @@
 (defn create-ant
   "create an ant at the location, returning an ant agent on the location"
   [loc dir]
-    (sync nil
-      (let [p (place loc)
-            a (struct ant dir)]
-        (alter p assoc :ant a)
-        (agent loc))))
+  (sync nil
+    (let [p (place loc)
+          a (struct ant dir)]
+      (alter p assoc :ant a)
+      (agent loc))))
 
 (defn setup
   "places initial food and ants, returns seq of ant agents"
@@ -38,10 +38,10 @@
 (defn bound
   "returns n wrapped into range 0-b"
   [b n]
-    (let [n (rem n b)]
-      (if (neg? n)
-        (+ n b)
-        n)))
+  (let [n (rem n b)]
+    (if (neg? n)
+      (+ n b)
+      n)))
 
 (defn wrand
   "given a vector of slice sizes, returns the index of a slice given a
@@ -69,8 +69,8 @@
 (defn delta-loc
   "returns the location one step in the given dir. Note the world is a torus"
   [[x y] dir]
-    (let [[dx dy] (dir-delta (bound 8 dir))]
-      [(bound dim (+ x dx)) (bound dim (+ y dy))]))
+  (let [[dx dy] (dir-delta (bound 8 dir))]
+    [(bound dim (+ x dx)) (bound dim (+ y dy))]))
 
 ;(defmacro dosync [& body]
 ;  `(sync nil ~@body))
@@ -82,27 +82,27 @@
 (defn turn
   "turns the ant at the location by the given amount"
   [loc amt]
-    (dosync
-     (let [p (place loc)
-           ant (:ant @p)]
-       (alter p assoc :ant (assoc ant :dir (bound 8 (+ (:dir ant) amt))))))
-    loc)
+  (dosync
+   (let [p (place loc)
+         ant (:ant @p)]
+     (alter p assoc :ant (assoc ant :dir (bound 8 (+ (:dir ant) amt))))))
+  loc)
 
 (defn move
   "moves the ant in the direction it is heading. Must be called in a
   transaction that has verified the way is clear"
   [loc]
-     (let [oldp (place loc)
-           ant (:ant @oldp)
-           newloc (delta-loc loc (:dir ant))
-           p (place newloc)]
+  (let [oldp (place loc)
+        ant (:ant @oldp)
+        newloc (delta-loc loc (:dir ant))
+        p (place newloc)]
          ;move the ant
-       (alter p assoc :ant ant)
-       (alter oldp dissoc :ant)
+    (alter p assoc :ant ant)
+    (alter oldp dissoc :ant)
          ;leave pheromone trail
-       (when-not (:home @oldp)
-         (alter oldp assoc :pher (inc (:pher @oldp))))
-       newloc))
+    (when-not (:home @oldp)
+      (alter oldp assoc :pher (inc (:pher @oldp))))
+    newloc))
 
 (defn take-food [loc]
   "Takes one food from current location. Must be called in a
@@ -148,31 +148,31 @@
        ;going home
        (cond
         (:home @p)
-          (-> loc drop-food (turn 4))
+        (-> loc drop-food (turn 4))
         (and (:home @ahead) (not (:ant @ahead)))
-          (move loc)
+        (move loc)
         :else
           (let [ranks (merge-with +
                         (rank-by (comp #(if (:home %) 1 0) deref) places)
                         (rank-by (comp :pher deref) places))]
-          (([move #(turn % -1) #(turn % 1)]
-            (wrand [(if (:ant @ahead) 0 (ranks ahead))
-                    (ranks ahead-left) (ranks ahead-right)]))
-           loc)))
+           (([move #(turn % -1) #(turn % 1)]
+             (wrand [(if (:ant @ahead) 0 (ranks ahead))
+                     (ranks ahead-left) (ranks ahead-right)]))
+            loc)))
        ;foraging
        (cond
         (and (pos? (:food @p)) (not (:home @p)))
-          (-> loc take-food (turn 4))
+        (-> loc take-food (turn 4))
         (and (pos? (:food @ahead)) (not (:home @ahead)) (not (:ant @ahead)))
-          (move loc)
+        (move loc)
         :else
           (let [ranks (merge-with +
                                   (rank-by (comp :food deref) places)
                                   (rank-by (comp :pher deref) places))]
-          (([move #(turn % -1) #(turn % 1)]
-            (wrand [(if (:ant @ahead) 0 (ranks ahead))
-                    (ranks ahead-left) (ranks ahead-right)]))
-           loc)))))))
+           (([move #(turn % -1) #(turn % 1)]
+             (wrand [(if (:ant @ahead) 0 (ranks ahead))
+                     (ranks ahead-left) (ranks ahead-right)]))
+            loc)))))))
 
 (defn evaporate
   "causes all the pheromones to evaporate a bit"
